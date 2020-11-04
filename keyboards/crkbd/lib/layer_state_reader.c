@@ -9,6 +9,8 @@
 #define L_RAISE 4
 #define L_ADJUST 8
 #define L_ADJUST_TRI 14
+#define L_GAME 16
+#define L_LGAME 48
 
 char layer_state_str[24];
 
@@ -28,8 +30,15 @@ const char *read_layer_state(void) {
   case L_ADJUST_TRI:
     snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Adjust");
     break;
+  case L_GAME:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Game");
+    break;
+  case L_LGAME:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: LwrGame");
+    break;
   default:
     snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Undef-%ld", layer_state);
+    break;
   }
 
   return layer_state_str;
