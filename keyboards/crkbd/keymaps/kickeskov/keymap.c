@@ -36,6 +36,9 @@ extern uint8_t is_master;
 #define _ADJUST 3
 #define _GAME 4
 #define _LGAME 5
+#define _MEDIA 6
+
+#define MDTAP ACTION_TAP_DANCE_DOUBLE(LOWER, MEDIA)
 
 enum custom_keycodes {
   QWERTY = SAFE_RANGE,
@@ -46,12 +49,46 @@ enum custom_keycodes {
   RGBRST,
   GAME,
   LGAME,
-  DEFAULT
+  DEFAULT,
+  MEDIA
 };
 
 enum macro_keycodes {
   KC_SAMPLEMACRO,
 };
+
+enum {
+  TD_LOWER_MEDIA = 0,
+};
+
+void dance_egg(qk_tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        SEND_STRING("Safety dance!");
+        reset_tap_dance(state);
+    }
+}
+
+void dance_tdmda_finished(qk_tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        layer_on(_LOWER);
+    } else {
+        layer_on(_MEDIA);
+    }
+}
+
+void dance_tdmda_reset(qk_tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        layer_off(_LOWER);
+    } else {
+        layer_off(_MEDIA);
+    }
+}
+
+qk_tap_dance_action_t tap_dance_actions[] = {
+  [TD_LOWER_MEDIA] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_tdmda_finished, dance_tdmda_reset),
+};
+
+#define TDMDA TD(TD_LOWER_MEDIA)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_QWERTY] = LAYOUT_split_3x6_3( \
@@ -60,9 +97,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LCTL,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, KC_RSFT,\
+      KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, TDMDA,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI,   LOWER,  KC_SPC,     KC_SPC,  RAISE,  KC_RALT \
+                                          KC_LGUI,   TDMDA,  KC_SPC,     KC_SPC,  RAISE,  KC_RALT \
                                       //`--------------------------'  `--------------------------'
 
   ),
@@ -99,7 +136,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI,   LOWER,  KC_SPC,     KC_ENT,   RAISE, KC_RALT \
+                                          KC_LGUI,   TDMDA,  KC_SPC,     KC_ENT,   RAISE, KC_RALT \
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -117,7 +154,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_LGAME] = LAYOUT_split_3x6_3( \
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-       KC_TAB,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  KC_LBRC,\
+       KC_GRV,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  KC_LBRC,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LCTL,    KC_X,    KC_6,    KC_W,    KC_7,    KC_C,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
@@ -125,7 +162,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           KC_LALT,   LGAME,  KC_SPC,    DEFAULT, XXXXXXX, XXXXXXX \
                                       //`--------------------------'  `--------------------------'
-  )
+  ),
+
+  [_MEDIA] = LAYOUT_split_3x6_3( \
+  //,-----------------------------------------------------.                    ,-----------------------------------------------------.
+      XXXXXXX, XXXXXXX, KC_MPLY, KC_MNXT, KC_MPRV, DEFAULT,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,\
+  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX, KC_VOLD, KC_VOLU, XXXXXXX,    GAME,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,\
+  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,\
+  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
+                                          KC_LGUI,   LOWER,  KC_SPC,     KC_ENT,   RAISE, KC_RALT \
+                                      //`--------------------------'  `--------------------------'
+  ),
+
 
 };
 
@@ -259,6 +309,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           layer_on(_LGAME);
         } else {
           layer_off(_LGAME);
+        }
+        return false;
+    case MEDIA:
+        if (record->event.pressed) {
+          layer_on(_MEDIA);
+        } else {
+          layer_off(_MEDIA);
         }
         return false;
     // KICKESKOV CUSTOM END
