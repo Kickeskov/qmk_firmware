@@ -134,11 +134,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        KC_GRV,    KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                         KC_6,    KC_7,    KC_8,    KC_9,    KC_0, KC_BSPC,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LCTL, XXXXXXX, XXXXXXX, XXXXXXX,  KC_SPC,  KC_ESC,                      KC_LEFT, KC_DOWN,   KC_UP,KC_RIGHT, XXXXXXX, XXXXXXX,\
+      KC_LALT, XXXXXXX, XXXXXXX,  KC_TAB,  KC_SPC,  KC_ESC,                      KC_LEFT, KC_DOWN,   KC_UP,KC_RIGHT, XXXXXXX, XXXXXXX,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT,    GAME, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                       KC_END, KC_HOME,KC_PGUP,KC_PGDOWN, XXXXXXX, XXXXXXX,\
+      KC_LGUI,    GAME, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                       KC_END, KC_HOME,KC_PGDOWN,  KC_PGUP, XXXXXXX, XXXXXXX,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI,   LOWER, KC_LALT,     KC_ENT,   RAISE, KC_RALT \
+                                          KC_LCTL,   LOWER, KC_LSFT,     KC_ENT,   RAISE, KC_RALT \
                                       //`--------------------------'  `--------------------------'
     ),
 
