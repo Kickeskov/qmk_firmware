@@ -37,6 +37,7 @@ extern uint8_t is_master;
 #define _GAME 4
 #define _LGAME 5
 #define _MEDIA 6
+#define _RGAME 7
 
 #define MDTAP ACTION_TAP_DANCE_DOUBLE(LOWER, MEDIA)
 
@@ -59,6 +60,7 @@ enum macro_keycodes {
 
 enum {
   TD_LOWER_MEDIA = 0,
+  TD_GAMING_MOD
 };
 
 void dance_egg(qk_tap_dance_state_t *state, void *user_data) {
@@ -84,11 +86,35 @@ void dance_tdmda_reset(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 
+void dance_game_finished(qk_tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        layer_on(_LGAME);
+    } else if (state->count == 2) {
+        layer_on(_RGAME);
+    } else {
+        layer_on(_MEDIA);
+    }
+}
+
+void dance_game_reset(qk_tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        layer_off(_LGAME);
+    } else if (state->count == 2) {
+        layer_off(_RGAME);
+    } else {
+        layer_off(_MEDIA);
+    }
+}
+
+
+
 qk_tap_dance_action_t tap_dance_actions[] = {
   [TD_LOWER_MEDIA] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_tdmda_finished, dance_tdmda_reset),
+  [TD_GAMING_MOD] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_game_finished, dance_game_reset),
 };
 
 #define TDMDA TD(TD_LOWER_MEDIA)
+#define GAMEL TD(TD_GAMING_MOD)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_QWERTY] = LAYOUT_split_3x6_3( \
@@ -99,7 +125,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, TDMDA,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI,   TDMDA,  KC_SPC,     KC_SPC,  RAISE,  KC_RALT \
+                                          KC_LGUI,   TDMDA, KC_LALT,     KC_SPC,  RAISE,  KC_RALT \
                                       //`--------------------------'  `--------------------------'
 
   ),
@@ -110,9 +136,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LCTL, XXXXXXX, XXXXXXX, XXXXXXX,  KC_SPC,  KC_ESC,                      KC_LEFT, KC_DOWN,   KC_UP,KC_RIGHT, XXXXXXX, XXXXXXX,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                       KC_END, KC_HOME,KC_PGUP,KC_PGDOWN, XXXXXXX, XXXXXXX,\
+      KC_LSFT,    GAME, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                       KC_END, KC_HOME,KC_PGUP,KC_PGDOWN, XXXXXXX, XXXXXXX,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI,   LOWER,  KC_SPC,     KC_ENT,   RAISE, KC_RALT \
+                                          KC_LGUI,   LOWER, KC_LALT,     KC_ENT,   RAISE, KC_RALT \
                                       //`--------------------------'  `--------------------------'
     ),
 
@@ -124,19 +150,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_UNDS, KC_PLUS, KC_LBRC, KC_RBRC, KC_BSLS, KC_TILD,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI,   LOWER,  KC_SPC,     KC_ENT,   RAISE, KC_RALT \
+                                          KC_LGUI,   LOWER, KC_LALT,     KC_ENT,   RAISE, KC_RALT \
                                       //`--------------------------'  `--------------------------'
   ),
 
   [_ADJUST] = LAYOUT_split_3x6_3( \
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-        RESET,  RGBRST, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                         GAME, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,\
+        RESET,  RGBRST, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                        KC_F1,   KC_F2,   KC_F3,   KC_F4, XXXXXXX, KC_BSPC,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,\
+      RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, XXXXXXX, XXXXXXX,                        KC_F5,   KC_F6,   KC_F7,   KC_F8,    GAME, XXXXXXX,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,\
+      RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD, XXXXXXX, XXXXXXX,                        KC_F9,  KC_F10,  KC_F11,  KC_F12, XXXXXXX, XXXXXXX,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI,   TDMDA,  KC_SPC,     KC_ENT,   RAISE, KC_RALT \
+                                          KC_LGUI,   TDMDA, KC_LALT,     KC_ENT,   RAISE, KC_RALT \
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -146,9 +172,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LCTL,    KC_T,    KC_Q,    KC_W,    KC_E,    KC_R,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT,    KC_G,    KC_A,    KC_S,    KC_D,    KC_F,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, KC_RSFT,\
+      KC_LSFT,    KC_C,    KC_A,    KC_S,    KC_D,    KC_F,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, KC_F9,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LALT,   LGAME,  KC_SPC,    DEFAULT, XXXXXXX, XXXXXXX \
+                                          KC_LALT,   GAMEL,  KC_SPC,    DEFAULT, XXXXXXX, XXXXXXX \
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -156,11 +182,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        KC_GRV,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  KC_LBRC,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LCTL,    KC_X,    KC_6,    KC_W,    KC_7,    KC_C,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,\
+      KC_LCTL,    KC_X,    KC_6,    KC_W,    KC_7,  KC_ESC,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LSFT,    KC_Z,    KC_A,    KC_S,    KC_D,    KC_V,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, KC_RSFT,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LALT,   LGAME,  KC_SPC,    DEFAULT, XXXXXXX, XXXXXXX \
+                                          KC_LALT,   GAMEL,  KC_SPC,    DEFAULT, XXXXXXX, XXXXXXX \
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -173,6 +199,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           KC_LGUI,   LOWER,  KC_SPC,     KC_ENT,   RAISE, KC_RALT \
+                                      //`--------------------------'  `--------------------------'
+  ),
+
+  [_RGAME] = LAYOUT_split_3x6_3( \
+  //,-----------------------------------------------------.                    ,-----------------------------------------------------.
+         KC_B,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  KC_LBRC,\
+  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+      KC_LCTL,    KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,\
+  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+      KC_LSFT,    KC_N,    KC_M,    KC_G, KC_COMM,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, KC_RSFT,\
+  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
+                                          KC_LALT,   GAMEL,  KC_SPC,    DEFAULT, XXXXXXX, XXXXXXX \
                                       //`--------------------------'  `--------------------------'
   ),
 
