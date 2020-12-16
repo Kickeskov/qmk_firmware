@@ -28,9 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // #define MASTER_RIGHT
 // #define EE_HANDS
 
-#define SSD1306OLED
+/* #define SSD1306OLED */
 
-#define USE_SERIAL_PD2
+/* #define USE_SERIAL_PD2 */
+#define USE_I2C
 
 #define TAPPING_FORCE_HOLD
 #define TAPPING_TERM 175
